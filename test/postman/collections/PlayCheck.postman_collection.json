@@ -1,0 +1,418 @@
+{
+	"info": {
+		"_postman_id": "00ff917f-81ff-48a9-9668-92553fd71a19",
+		"name": "PlayCheck",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "List All Tournament Detail Options",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response has all properties\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.data.Games).to.have.length(4);",
+							"    pm.expect(json.data.Regions).to.have.length(4);",
+							"    pm.expect(json.data.Tokens).to.have.length(4);",
+							"    pm.environment.set('gameId', json.data.Games[0].id);",
+							"    pm.environment.set('regionId', json.data.Regions[0].id);",
+							"    pm.environment.set('newRegionId', json.data.Regions[1].id);",
+							"    pm.environment.set('tokenId', json.data.Tokens[0].id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\n    Games {\n        id\n        name\n        createdAt\n        updatedAt\n    }\n    Regions {\n        id\n        name\n        createdAt\n        updatedAt\n    }\n    Tokens {\n        id\n        name\n        createdAt\n        updatedAt\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Tournament Copy With Invalid Details",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response shows error\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.errors[0].message).to.eq('Region(111111111111111111111111) not found.');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  createTournament(tournamentData: {\n    gameId: \"{{gameId}}\", \n    regionId: \"111111111111111111111111\", \n    tokenId: \"{{tokenId}}\"\n  }) {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      name\n    }\n    ownerParticipated\n    participants {\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Tournament",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response has all properties\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.data.createTournament.id).to.be.a('string');",
+							"    pm.environment.set('tournamentId', json.data.createTournament.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  createTournament(tournamentData: {\n    gameId: \"{{gameId}}\", \n    regionId: \"{{regionId}}\", \n    tokenId: \"{{tokenId}}\"\n  }) {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      name\n    }\n    ownerParticipated\n    participants {\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Tournament With Invalid Tournament ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response shows error\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.errors[0].message).to.eq('Tournament(111111111111111111111111) not found.');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  updateTournament(id: \"111111111111111111111111\", tournamentData: {\n    gameId: \"{{gameId}}\", \n    regionId: \"{{newRegionId}}\", \n    tokenId: \"{{tokenId}}\"\n  }) {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      name\n    }\n    ownerParticipated\n    participants {\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Tournament With Invalid Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response shows error\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.errors[0].message).to.eq('Game(111111111111111111111111) not found.');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  updateTournament(id: \"{{tournamentId}}\", tournamentData: {\n    gameId: \"111111111111111111111111\", \n    regionId: \"{{newRegionId}}\", \n    tokenId: \"{{tokenId}}\"\n  }) {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      name\n    }\n    ownerParticipated\n    participants {\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Tournament",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response has all properties\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.data.updateTournament.id).to.eq(pm.environment.get('tournamentId'));",
+							"    pm.expect(json.data.updateTournament.details.region.id).to.eq(pm.environment.get('newRegionId'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  updateTournament(id: \"{{tournamentId}}\", tournamentData: {\n    gameId: \"{{gameId}}\", \n    regionId: \"{{newRegionId}}\", \n    tokenId: \"{{tokenId}}\"\n  }) {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            id\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      name\n    }\n    ownerParticipated\n    participants {\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Join Tournament With Invalid Tournament ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response shows error\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.errors[0].message).to.eq('Tournament(111111111111111111111111) not found.');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  joinTournament(id: \"111111111111111111111111\") {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      name\n    }\n    ownerParticipated\n    participants {\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Join Self Tournament",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response shows error\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.data.joinTournament.id).to.eq(pm.environment.get('tournamentId'));",
+							"    pm.expect(json.data.joinTournament.participants).to.have.length(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  joinTournament(id: \"{{tournamentId}}\") {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      name\n    }\n    ownerParticipated\n    participants {\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Join Other Tournament",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response shows error\", () => {",
+							"    const json = pm.response.json();",
+							"    pm.expect(json.data.joinTournament.id).to.eq(pm.environment.get('tournamentId'));",
+							"    pm.expect(json.data.joinTournament.participants).to.have.length(1);",
+							"    pm.expect(json.data.joinTournament.owner.id !== json.data.joinTournament.participants[0].id).to.eq(true)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{uziAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  joinTournament(id: \"{{tournamentId}}\") {\n    id\n    details {\n        game {\n            name\n        }\n        region {\n            name\n        }\n        token {\n            name\n        }\n    }\n    owner {\n      id\n      name\n    }\n    ownerParticipated\n    participants {\n      id\n      name\n    }\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{API_HOST}}/graphql",
+					"host": [
+						"{{API_HOST}}"
+					],
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{fakerAccessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

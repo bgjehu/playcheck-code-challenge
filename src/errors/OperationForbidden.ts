@@ -1,0 +1,1 @@
+export class OperationForbidden extends Error { }

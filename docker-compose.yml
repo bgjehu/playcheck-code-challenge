@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    container_name: playcheck-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - playcheck-db-volume:/data
+
+volumes:
+  playcheck-db-volume:
